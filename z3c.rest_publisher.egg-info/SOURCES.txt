@@ -1,0 +1,17 @@
+README.md
+setup.py
+z3c/__init__.py
+z3c.rest_publisher.egg-info/PKG-INFO
+z3c.rest_publisher.egg-info/SOURCES.txt
+z3c.rest_publisher.egg-info/dependency_links.txt
+z3c.rest_publisher.egg-info/entry_points.txt
+z3c.rest_publisher.egg-info/namespace_packages.txt
+z3c.rest_publisher.egg-info/not-zip-safe
+z3c.rest_publisher.egg-info/requires.txt
+z3c.rest_publisher.egg-info/top_level.txt
+z3c/rest_publisher/__init__.py
+z3c/rest_publisher/base.py
+z3c/rest_publisher/tests.py
+z3c/rest_publisher/zope2.py
+z3c/rest_publisher/example/__init__.py
+z3c/rest_publisher/example/rest_api.py

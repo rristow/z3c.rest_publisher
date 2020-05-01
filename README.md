@@ -1,5 +1,6 @@
+
 z3c.rest_publisher Package
-=========================
+==========================
 
 Overview
 --------
@@ -13,9 +14,9 @@ For example, in the following request:
     curl http://localhost:8080/api/members/my_user
 
 where
-- api - It's a view (inherited from APIBase) registered for ROOT
-- members - It's a object inherited from APIBase included in "api"
-- myuser - It's a object inherited from APIBase included in "members"
+ - api - It's a view (inherited from APIBase) registered for ROOT
+ - members - It's a object inherited from APIBase included in "api"
+ - myuser - It's a object inherited from APIBase included in "members"
 
 Install
 -------
@@ -23,24 +24,25 @@ Install
 pip install z3c.rest_publisher
 
 Configuration
--------
+-------------
 
 1 - API Root
 The starting point for the API is a traditional view registered in Zope ZCML. e.g.
 
 ```xml
-  <view
-    name="api"
-    for="zope.location.interfaces.IRoot"
-    type="zope.publisher.interfaces.browser.IBrowserRequest"
-    provides="zope.publisher.interfaces.browser.IBrowserPublisher"
-    factory=".rest_api.APIRoot"
-    permission="zope.Public"
-    allowed_attributes="publishTraverse browserDefault __call__"
-  ></view>
+<view
+name="api"
+for="zope.location.interfaces.IRoot"
+type="zope.publisher.interfaces.browser.IBrowserRequest"
+provides="zope.publisher.interfaces.browser.IBrowserPublisher"
+factory=".rest_api.APIRoot"
+permission="zope.Public"
+allowed_attributes="publishTraverse browserDefault __call__">
+</view>
 ```
+
 Authentication
--------
+--------------
 
 1 - Zope-Authentication
 You can use traditional Zope systems for authentication, for example by changing permissions for the view
@@ -64,7 +66,7 @@ To test:
     curl --user demo:demo  http://localhost:8080/api/
 
 REST functions
--------
+--------------
 
 There are two ways to add a REST function to the Object.
 
