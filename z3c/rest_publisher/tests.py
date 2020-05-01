@@ -9,7 +9,7 @@ def test_suite():
 
         # Unit tests for your API
         doctestunit.DocFileSuite(
-            'README.txt', package='z3c.rest_publisher',
+            'README.md', package='z3c.rest_publisher',
             setUp=testing.setUp, tearDown=testing.tearDown),
 
         #TODO
