@@ -1,0 +1,26 @@
+Metadata-Version: 1.1
+Name: z3c.rest-publisher
+Version: 0.1
+Summary: This product registers Zope-traverses (IBrowserPublisher) to implement basic REST requests in a simple way.
+Home-page: http://svn.plone.org/svn/collective/
+Author: Rodrigo Ristow
+Author-email: rodrigo@maxttor.com
+License: GPL
+Description: Introduction
+        ============
+        
+        
+        
+        This product may contain traces of nuts.
+        
+        Changelog
+        =========
+        
+        0.1dev (unreleased)
+        -------------------
+        
+        - Initial release
+        
+Keywords: REST Zope IBrowserPublisher
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
