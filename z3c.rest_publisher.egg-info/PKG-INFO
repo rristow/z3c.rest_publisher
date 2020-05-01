@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: z3c.rest-publisher
-Version: 0.1
+Version: 0.4
 Summary: This product has the base classes to implement a REST-Server using the concepts of Zope-traverser (IBrowserPublisher)
 Home-page: http://svn.plone.org/svn/collective/
 Author: Rodrigo Ristow
@@ -140,13 +140,15 @@ Description:
         
         Please see "z3c.rest_publisher/example" for an example.
         
+        
         Changelog
         =========
         
-        0.1dev (unreleased)
-        -------------------
+        0.1 (01.05.20)
+        --------------
         
         - Initial release
+        
         
 Keywords: REST Zope IBrowserPublisher
 Platform: UNKNOWN

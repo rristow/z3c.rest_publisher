@@ -1,3 +1,4 @@
+CHANGES.txt
 README.md
 setup.py
 z3c/__init__.py
