@@ -1,4 +1,4 @@
-z3c.rest_publisher Package Readme
+z3c.rest_publisher Package
 =========================
 
 Overview
@@ -125,7 +125,7 @@ To test:
 
     curl -X GET http://localhost:8080/api/members/user1
 
-Example application:
+Example
 -------
 
 Please see "z3c.rest_publisher/example" for an example.
