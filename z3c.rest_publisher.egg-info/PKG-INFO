@@ -6,7 +6,8 @@ Home-page: http://svn.plone.org/svn/collective/
 Author: Rodrigo Ristow
 Author-email: rodrigo@maxttor.com
 License: GPL
-Description: z3c.rest_publisher Package
+Description: 
+        z3c.rest_publisher Package
         ==========================
         
         Overview
@@ -54,23 +55,19 @@ Description: z3c.rest_publisher Package
         1 - Zope-Authentication
         You can use traditional Zope systems for authentication, for example by changing permissions for the view
         
-        ```
-        permission="zope.Public"
-        or
-        permission="zope.ManageContent"
-        ```
+            permission="zope.Public"
+            or
+            permission="zope.ManageContent"
         
         2 - Custom authentication
         
         If you wish, you can include customized authentication for the API. Just overwrite the "check_authentication" method in the class.
         For example, to implement a basic authentication:
         
-        ```
-        class APIRoot(APIBase):
-            def check_authentication(self):
-            user, pwd = self.request._authUserPW()
-            return user == 'demo' and pwd == 'demo'
-        ```
+            class APIRoot(APIBase):
+                def check_authentication(self):
+                    user, pwd = self.request._authUserPW()
+                    return user == 'demo' and pwd == 'demo'
         
         To test:
         
