@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.5 (05.05.20)
+--------------
+
+- Added the built-in documentation (default: /help) for the REST API
+
 0.4 (01.05.20)
 --------------
 
