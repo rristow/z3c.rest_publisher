@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: z3c.rest-publisher
-Version: 0.4
+Version: 0.5
 Summary: This product has the base classes to implement a REST-Server using the concepts of Zope-traverser (IBrowserPublisher)
 Home-page: http://svn.plone.org/svn/collective/
 Author: Rodrigo Ristow
@@ -135,6 +135,13 @@ Description:
         
             curl -X GET http://localhost:8080/api/members/user1
         
+        API documentation
+        -----------------
+        
+        The class RestDoc provide a simple built-in documentation of all REST-APi methods. 
+        The default url is '[API_ROOT]/help' but you can change the property 'doc_endpoint' (APIBase) if you desire.
+        
+        
         Example
         -------
         
@@ -143,6 +150,11 @@ Description:
         
         Changelog
         =========
+        
+        0.5 (05.05.20)
+        --------------
+        
+        - Added the built-in documentation (default: /help) for the REST API
         
         0.4 (01.05.20)
         --------------

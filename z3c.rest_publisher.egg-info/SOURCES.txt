@@ -12,6 +12,8 @@ z3c.rest_publisher.egg-info/requires.txt
 z3c.rest_publisher.egg-info/top_level.txt
 z3c/rest_publisher/__init__.py
 z3c/rest_publisher/base.py
+z3c/rest_publisher/configure.zcml
+z3c/rest_publisher/doc.pt
 z3c/rest_publisher/tests.py
 z3c/rest_publisher/zope2.py
 z3c/rest_publisher/example/__init__.py
