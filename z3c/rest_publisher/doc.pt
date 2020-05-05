@@ -1,0 +1,38 @@
+<html>
+<body>
+<h1>REST-API Documentation</h1>
+<p>Index</p>
+<ul>
+  <li tal:repeat="func options/data">
+    [<span tal:content="func/http_method"></span>]
+    <a tal:content="func/url" tal:attributes="href python:'#' + func['id']" href="">func</a>
+  </li>
+</ul>
+
+<div tal:repeat="func options/data">
+  <hr/>
+  <h2 id="id" tal:attributes="id func/id" tal:content="func/url"></h2>
+
+  <p><strong>HTTP-Method</strong></p>
+  <p tal:content="func/http_method">GET</p>
+
+  <p><strong>Description</strong></p>
+  <tal:doc tal:repeat="doc func/doc">
+    <p><span style="color: #333333;" tal:content="doc"></span></p>
+  </tal:doc>
+
+  <p><strong>URL</strong></p>
+    <p>
+      <a tal:content="func/url" tal:condition="func/show_link" tal:attributes="href func/url" href="">func</a>
+      <span tal:content="func/url" tal:condition="not:func/show_link" >func</span>
+    </p>
+<!--
+  <p><strong>Sample Call</strong></p>
+  <blockquote>
+    <p><strong>CALL</strong></p>
+  </blockquote>
+-->
+</div>
+
+</body>
+</html>

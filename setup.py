@@ -31,6 +31,7 @@ setup(name='z3c.rest_publisher',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'zope.app.publication',
           # -*- Extra requirements: -*-
       ],
       entry_points="""

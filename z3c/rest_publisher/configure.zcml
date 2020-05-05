@@ -2,9 +2,13 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five">
 
-  <five:registerPackage package="." initialize=".zope2.initialize" />
+<!--  <five:registerPackage package="." initialize=".zope2.initialize" /> -->
 
   <class class=".base.APIData">
+    <allow attributes="publishTraverse browserDefault __call__"/>
+  </class>
+
+  <class class=".base.RestDoc">
     <allow attributes="publishTraverse browserDefault __call__"/>
   </class>
 

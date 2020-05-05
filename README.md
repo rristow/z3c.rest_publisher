@@ -127,6 +127,13 @@ To test:
 
     curl -X GET http://localhost:8080/api/members/user1
 
+API documentation
+-----------------
+
+The class RestDoc provide a simple built-in documentation of all REST-APi methods. 
+The default url is '[API_ROOT]/help' but you can change the property 'doc_endpoint' (APIBase) if you desire.
+
+
 Example
 -------
 
