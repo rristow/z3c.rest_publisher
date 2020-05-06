@@ -34,7 +34,6 @@ class RestDoc(BrowserPage):
         self.request = request
 
     def generate_doc_verb(self, name, url, obj):
-        print "====generate_doc_verb - name:", name, "url:", url, "obj:", obj
         ret = []
         if name != '*':
             url = "%s/%s" % (url, name)
@@ -62,7 +61,6 @@ class RestDoc(BrowserPage):
                            'url': doc_url,
                            'show_link': verb == 'get' and name != '*',
                            'doc': doc}
-                    print "  ", doc
                     ret.append(doc)
 
         for child_name, child in obj.content.items():
