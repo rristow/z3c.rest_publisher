@@ -106,7 +106,7 @@ class APIBase(object):
             self.request.response.setStatus(403)
             return "The HTTP-method '%s' is not supported" % method
 
-        if self.check_authentication(method):
+        if not self.check_authentication(method):
             self.request.response.setStatus(403)
             return "Access denied"
 
