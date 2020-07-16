@@ -1,148 +1,120 @@
 import json
-
+import logging
 from wcore import interfaces
+from zope.browserpage import ViewPageTemplateFile
 from zope.component import adapts, queryMultiAdapter
 from zope.interface import implements
+from zope.publisher.browser import BrowserPage
 from zope.publisher.browser import BrowserPage
 from zope.publisher.interfaces import NotFound
 from zope.publisher.interfaces import TraversalException
 from zope.publisher.interfaces.browser import IBrowserRequest, IBrowserPublisher
 
-
-class APIData(BrowserPage):
-    """ This is an auxiliary class to return REST data. Its necessary because the traverse expects q view-like object
-    returning from publishTraverse.
-    """
-
-    def __init__(self, context, request, data):
-        self.context = context
-        self.request = request
-        self.data = data
-
-    def __call__(self):
-        return json.dumps(self.data)
-
-
-from zope.publisher.browser import BrowserPage
-from zope.browserpage import ViewPageTemplateFile
-
-
-class RestDoc(BrowserPage):
-
-    def __init__(self, rest_obj_root, request):
-        self.context = rest_obj_root
-        self.request = request
-
-    def generate_doc_verb(self, name, url, obj):
-        ret = []
-        if name != '*':
-            url = "%s/%s" % (url, name)
-
-        for func_name in dir(obj):
-            for allowed_method in obj.allowed_methods:
-                func = None
-                if func_name == allowed_method:
-                    doc_name = name
-                    verb = allowed_method
-                    if name == '*':
-                        doc_url = "%s/[ID]" % url
-                    else:
-                        doc_url = url
-                    func = getattr(obj, func_name)
-                elif func_name.startswith("%s_" % allowed_method):
-                    verb, doc_name = func_name.split("_", 1)
-                    func = getattr(obj, func_name)
-                    doc_url = "%s/%s" % (url, doc_name)
-                if func:
-                    doc = [obj.__doc__] + func.__doc__.split("\n")
-                    doc = {'name': doc_name,
-                           'id': "%s_%s" % (verb, url),
-                           'http_method': verb.upper(),
-                           'url': doc_url,
-                           'show_link': verb == 'get' and name != '*',
-                           'doc': doc}
-                    ret.append(doc)
-
-        for child_name, child in obj.content.items():
-            ret += self.generate_doc_verb(child_name, url=url, obj=child)
-        return ret
-
-    def __call__(self, *args, **kwargs):
-        data = self.generate_doc_verb(self.context.name, url="",
-                                      obj=self.context)
-        return ViewPageTemplateFile('doc.pt')(instance=self, data=data)
+logger = logging.getLogger(__name__)
 
 
 class APIBase(object):
     """ Base class for REST Objects """
-    name = ""
-    adapts(interfaces.IREST, IBrowserRequest)
+    adapts(IBrowserRequest)
     implements(IBrowserPublisher)
 
+    # False (default) is used to avoid returning the default error page (HTML).
+    raise_exceptions = False
+    # it is possible to inform the verb in the query-string in case you can't use http-methods.
+    # e.g. If querystring_verb_name='verb', send a POST request and add something like ?verb=PATCH in the query-string.
+    querystring_verb_name = ""
+    # Make this API public - It will not check the custom authentication
+    public = False
+    # All methods supported by this API
     allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-    template_doc = "doc.html"
-    doc_endpoint = 'help'
 
-    # Add here another APIBase 'class' to traverse. e.g. {'members': APIClassMembers}
-    content = {}
-
-    def __init__(self, context, request, name):
-        self.name = name
+    def __init__(self, context, request, name, parent_api_obj=None):
         self.context = context
         self.request = request
+        self.name = name
+        self.parent_api_obj = parent_api_obj
 
     def check_authentication(self, name):
         """  Overwrite this method to add a custom authentication for your REST API """
         return True
 
+    def format_output(self, data):
+        """ format the output. default: json  """
+        return json.dumps(data)
+
     def browserDefault(self, request):
         return self, ()
 
-    def __call__(self):
-        method = self.request['REQUEST_METHOD'].lower()
-        if method not in self.allowed_methods:
-            self.request.response.setStatus(403)
-            return "The HTTP-method '%s' is not supported" % method
-
-        if not self.check_authentication(method):
-            self.request.response.setStatus(403)
-            return "Access denied"
-
-        # Search for a method with the sme name as REQUEST_METHOD and call it
-        if hasattr(self, method):
-            res = getattr(self, method)()
-            return json.dumps(res)
-        else:
+    def error_verb(self, ex):
+        """ Overwrite this function if you want specific action on verb errors """
+        logger.error(ex, exc_info=True)
+        if not self.raise_exceptions:
             self.request.response.setStatus(500)
-            return "The HTTP-method '%s' is not supported here" % method
+            return "Server error (verb) - %s" % ex
+        else:
+            raise
+
+    def error_traverse(self, ex, request, name):
+        """ Overwrite this function if you want specific action on traverse errors """
+        logger.error(ex, exc_info=True)
+        raise
+
+    def __call__(self):
+        try:
+            method = self.request['REQUEST_METHOD'].lower()
+            if self.querystring_verb_name:
+                method = self.request.get(self.querystring_verb_name, method).lower()
+
+            if method not in self.allowed_methods:
+                self.request.response.setStatus(403)
+                return "The HTTP-method '%s' is not supported" % method
+
+            if not self.check_authentication(method):
+                self.request.response.setStatus(403)
+                return "Access denied"
+
+            # Search for a method with the same name as REQUEST_METHOD and call it
+            fnc = "verb_%s" % method
+            if hasattr(self, fnc):
+                res = getattr(self, fnc)()
+                return self.format_output(res)
+            else:
+                self.request.response.setStatus(500)
+                return "The HTTP-method '%s' is not supported here" % method
+        except Exception as ex:
+            return self.error_verb(ex)
 
     def publishTraverse(self, request, name):
-        if not self.check_authentication(name):
-            raise TraversalException("Access denied")
+        try:
+            if not self.public and not self.check_authentication(name):
+                raise TraversalException("Access denied")
 
-        # Check call to documentation
-        if name == self.doc_endpoint:
-            return RestDoc(self, self.request)
+            # Traverse 1 - Call traverse_{Name} to get one API-Object with the name {Name}
+            method = self.request['REQUEST_METHOD'].lower()
+            func = "traverse_{name}".format(name=name)
+            if hasattr(self, func):
+                obj = getattr(self, func)(request, name)
+                return obj
 
-        # Traverse 1 - Check if this class has a method with the format {HTTP-Method}_{Name}
-        method = self.request['REQUEST_METHOD'].lower()
-        func = "{method}_{name}".format(method=method, name=name)
-        if hasattr(self, func):
-            ret = getattr(self, func)()
-            return APIData(self.context, self.request, ret)
+            # Traverse 2 - Call traverse_NAME to return a child-object with the key = {name}
+            func = "traverse_NAME"
+            if hasattr(self, func):
+                obj = getattr(self, func)(request, name)
+                return obj
 
-        # Traverse 2 - Check if the object has "child" APIBase class registered in content
-        if name in self.content:
-            return self.content[name](self.context, self.request, name)
+            # Traverse 3 - Fall back to views
+            view = queryMultiAdapter((self.context, request), name=name)
+            if view is not None:
+                return view
 
-        # Traverse 3 - Check if there is a catch all (*) to access the objects
-        if '*' in self.content:
-            return self.content["*"](self.context, self.request, name)
-
-        # Traverse 4 - Fall back to views
-        view = queryMultiAdapter((self.context, request), name=name)
-        if view is not None:
-            return view
-
-        # Return a 404 Not Found error page
-        raise NotFound(self.context, name, request)
+            # Traverse 4 - If nothing found, this method will be called
+            func = "traverse_DEFAULT"
+            if hasattr(self, func):
+                obj = getattr(self, func)(request, name)
+                return obj
+            # Return a 404 Not Found error page
+            raise NotFound(self.context, name, request)
+        except NotFound:
+            raise
+        except Exception as ex:
+            return self.error_traverse(ex, request, name)

@@ -1,3 +1,4 @@
 dist
 *.pyc
-
+build
+z3c.rest_publisher.egg-info/*

@@ -1,10 +1,17 @@
 Changelog
 =========
 
-0.7 (05.05.20)
+0.9 (15.07.20)
+--------------
+
+- Redesign code.
+
+
+0.8 (08.05.20)
 --------------
 
 - Added the built-in documentation (default: /help) for the REST API
+- Fixed interfaces
 
 
 0.4 (01.05.20)

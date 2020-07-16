@@ -10,12 +10,11 @@ No documents or folders will be accessed directly. It is necessary to create cla
 
 For example, in the following request:
 
-    curl http://localhost:8080/api/members/my_user
+    curl http://localhost:8080/testapi/companies/company1
 
-where
 - api - It's a view (inherited from APIBase) registered for ROOT
-- members - It's a object inherited from APIBase included in "api"
-- myuser - It's a object inherited from APIBase included in "members"
+- companies - It's a object inherited from APIBase traversed from "api"
+- company1 - It's a object inherited from APIBase traversed from "companies"
 
 Install
 -------
@@ -23,24 +22,129 @@ Install
 pip install z3c.rest_publisher
 
 Configuration
--------
+-------------
 
-1 - API Root
+1 - First create a base class for the API. Although this is not mandatory, this is the best way to 
+adjust the existing options.
+
+from z3c.rest_publisher.base import APIBase
+
+```python
+class MyAPIBase(APIBase):
+    # False (default) is used to avoid returning the default error page (HTML).
+    raise_exceptions = False
+    # it is possible to inform the verb in the query-string in case you can't use http-methods.
+    # e.g. If querystring_verb_name='verb', send a POST request and add something like ?verb=PATCH in the query-string.
+    querystring_verb_name = "verb"
+    # if True it will make this API public (It will not check the 'check_authentication' method)
+    public = False
+    # All methods supported by this API
+    allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
+
+    #def check_authentication(self, name):
+    #    Add the custom authentication here
+    #    return True
+
+    # def format_output(self, data):
+    #   overwrite this method use another format (default json), like: xml, txt, etc...
+
+```
+
+2 - Create the API-Root
 The starting point for the API is a traditional view registered in Zope ZCML. e.g.
+
+```python
+class APIRoot(MyAPIBase):
+
+    def verb_get(self):
+        """ Get data from all users """
+        return {"result": "Hello world!"}
+```
+
+2.1 - And register the API-Root
 
 ```xml
   <view
-    name="api"
+    name="testapi"
     for="zope.location.interfaces.IRoot"
     type="zope.publisher.interfaces.browser.IBrowserRequest"
     provides="zope.publisher.interfaces.browser.IBrowserPublisher"
-    factory=".rest_api.APIRoot"
+    factory=".[myclass].APIRoot"
     permission="zope.Public"
     allowed_attributes="publishTraverse browserDefault __call__"
   ></view>
 ```
+
+Tests e.g.
+
+    curl -X GET http://127.0.0.1:8080/testapi
+    {"result": "Hello world!"}
+
+4 - Add more verbs
+--------------------
+
+To add an verb in the API, include a "verb_\[method]" function in the object.
+The supported verbs are by default: 'get', 'post', 'put', 'delete' and 'patch'.  
+
+```python
+class APIRoot(MyAPIBase):
+
+    def verb_post(self):
+        """ Get data from all users """
+        return {"result": "You sent a POST!"}
+```
+
+Tests e.g.
+
+    curl -X POST http://127.0.0.1:8080/testapi
+    {"result": "You sent a POST!"}
+
+
+3 - Add more resources (traverse)
+---------------------------------
+
+To add a child API, include a "traverse_\[name]" function in the API-Class.
+All 'traverse' functions should return a class inherited from APIBase.
+
+```python
+DB =  [{"id": "book1", "title": "My first book!"}, {"id": "book2", "title": "My second book!"}]
+class APIBooks(MyAPIBase):
+    def verb_get(self):
+        return DB
+
+class APIRoot(MyAPIBase):
+    def traverse_books(self, request, name):
+        return APIBooks(context=self.context, request=request, name=name, parent_api_obj=self)
+```
+
+4 - Add access to the objects (traverse)
+----------------------------------------
+
+To access an object in the resource, include a "traverse_NAME" function in the API-Class.
+All 'traverse' functions should return a class inherited from APIBase.
+
+```python
+class APIBook(MyAPIBase):
+    def verb_get(self):
+        return self.context
+
+class APIBooks(MyAPIBase):
+    def traverse_NAME(self, request, name):
+        book = [b for b in DB if b['id'] == name]
+        if book:
+            return APISector(context=book[0], request=request, name=name, parent_api_obj=self)
+        else:
+            raise NotFound(self.context, name, request)
+```
+
+Tests e.g.
+
+    curl -X GET http://127.0.0.1:8080/testapi/books/book2
+    {"id": "book2", "title": "My second book!"}
+
+
 Authentication
--------
+--------------
 
 1 - Zope-Authentication
 You can use traditional Zope systems for authentication, for example by changing permissions for the view
@@ -52,80 +156,21 @@ You can use traditional Zope systems for authentication, for example by changing
 2 - Custom authentication
 
 If you wish, you can include customized authentication for the API. Just overwrite the "check_authentication" method in the class.
-For example, to implement a basic authentication:
+For example, to implement basic-authentication:
 
-    class APIRoot(APIBase):
-        def check_authentication(self):
-            user, pwd = self.request._authUserPW()
-            return user == 'demo' and pwd == 'demo'
+```python
+class MyAPIBase(APIBase):
+    def check_authentication(self, name):
+       user, pwd = self.request._authUserPW()
+       if user == 'demo' and pwd == 'demo':
+            return True
+```
 
-To test:
+Tests e.g.
 
-    curl --user demo:demo  http://localhost:8080/api/
+    curl --user demo:demo  http://localhost:8080/testapi/
 
-REST functions
--------
+Example application
+-------------------
 
-There are two ways to add a REST function to the Object.
-
-1 - REST function as a method
-Include a method in the format {HTTP-Method}_{Name} (lower-case), e.g.
-
-    class APIRoot(APIBase):
-        def get_list_admins(self):
-            return [{'id': '1', 'firstname': 'Alberto', 'lastname': 'Santos-Dumont'},
-                    {'id': '2', 'firstname': 'Edson', 'lastname': 'Arantes do Nascimento'}]
-        def put_list_admins(self):
-            return self.get_list_admins()
-
-To test:
-
-    curl -X GET http://localhost:8080/api/list_admins
-    curl -X PUT http://localhost:8080/api/list_admins
-
-2 - Concatenated REST objects
-It is possible to create a new REST object and concatenate it with the current object.
-This is the equivalent implementation from the previous method.
-
-    class APIListAdmins(APIBase):
-        def get(self):
-            return [{'id': 'user1', 'firstname': 'Alberto', 'lastname': 'Santos-Dumont'},
-                    {'id': 'user2', 'firstname': 'Edson', 'lastname': 'Arantes do Nascimento'}]
-        def put(self):
-            return self.get()
-
-    class APIRoot(APIBase):
-        content = {'list_admins': APIListAdmins}
-
-To test:
-
-    curl -X GET http://localhost:8080/api/list_admins
-    curl -X PUT http://localhost:8080/api/list_admins
-
-2.1 - REST function for objects (catch all)
-To implement a "generic" traverse to access specific database objects, use the wildcard "*".
-
-    class APIUSer(APIBase):
-        def get(self):
-            if self.name == 'user1'
-                return {'id': 'user1', 'firstname': 'Alberto', 'lastname': 'Santos-Dumont'}
-            elif self.name == 'user2':
-                return {'id': 'user2', 'firstname': 'Edson', 'lastname': 'Arantes do Nascimento'}
-            else:
-                self.request.response.setStatus(404)
-                return "User not found"
-
-    class APIMembers(APIBase):
-        content = {'*': APIUSer}
-
-    class APIRoot(APIBase):
-        content = {'members': APIListAdmins}
-
-To test:
-
-    curl -X GET http://localhost:8080/api/members/user1
-
-Example application:
--------
-
-Please see "z3c.rest_publisher/example" for an example.
+Please check "z3c.rest_publisher/example" for a complete example.

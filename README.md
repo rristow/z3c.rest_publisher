@@ -117,15 +117,23 @@ To implement a "generic" traverse to access specific database objects, use the w
                 self.request.response.setStatus(404)
                 return "User not found"
 
-    class APIMembers(APIBase):
+    class APIMembersRoot(APIBase):
         content = {'*': APIUSer}
 
     class APIRoot(APIBase):
         content = {'members': APIListAdmins}
 
+
+Be aware that curl just send data with POST methods. This is a limitation discussed in some posts.
+To test these methods with curl, use the 'querystring_verb_name' option as documented. e.g.
+querystring_verb_name=verb
+curl -X POST --user demo:demo  http://127.0.0.1:9095/testapi/companies/company1/sectors/sector2/users/user4?verb=PATCH  --data-raw '{"firstname": "New Name"}'
+
 To test:
 
     curl -X GET http://localhost:8080/api/members/user1
+    
+(Check more examples in example/README.txt)  
 
 API documentation
 -----------------

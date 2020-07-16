@@ -1,0 +1,103 @@
+[
+  {
+    "companies": [
+      {
+        "id": "company1",
+        "title": "My Company 1",
+        "telephone": "12345679001",
+        "mail": "info@company1.com",
+        "sectors": [
+          {
+            "id": "sector1",
+            "title": "The Sector 1 of company 1",
+            "users": [
+              {
+                "id": "user1",
+                "firstname": "Alberto",
+                "lastname": "Santos-Dumont",
+                "mail": "alberto@airplane.com",
+                "admin": true
+              },
+              {
+                "id": "user2",
+                "firstname": "Edson",
+                "lastname": "Arantes do Nascimento",
+                "mail": "pele@futebol.com",
+                "admin": false
+              }
+            ]
+          },
+          {
+            "id": "sector2",
+            "title": "The Sector 2 of company 1",
+            "users": [
+              {
+                "id": "user3",
+                "firstname": "Noell",
+                "lastname": "bey",
+                "mail": "bey@mail.com",
+                "admin": false
+              },
+              {
+                "id": "user4",
+                "firstname": "Willard",
+                "lastname": "valek",
+                "mail": "vivi@mail.com",
+                "admin": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "company2",
+        "title": "My Company 2",
+        "telephone": "12345679002",
+        "mail": "info@company2.com",
+        "sectors": [
+          {
+            "id": "sector1",
+            "title": "The Sector 1 of company2",
+            "users": [
+              {
+                "id": "user5",
+                "firstname": "Logan",
+                "lastname": "Keller",
+                "mail": "lolo@tv.com",
+                "admin": false
+              },
+              {
+                "id": "user6",
+                "firstname": "Mcneil",
+                "lastname": "banana",
+                "mail": "banana@frut.com",
+                "admin": false
+              },
+              {
+                "id": "user7",
+                "firstname": "Fernanda",
+                "lastname": "Martinez",
+                "mail": "fernanda@luta.com",
+                "admin": true
+              },
+              {
+                "id": "user8",
+                "firstname": "Arthur",
+                "lastname": "MVal",
+                "mail": "arthur@mail.com",
+                "admin": false
+              },
+              {
+                "id": "user9",
+                "firstname": "Didi",
+                "lastname": "Moco",
+                "mail": "didi@trapas.com",
+                "admin": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

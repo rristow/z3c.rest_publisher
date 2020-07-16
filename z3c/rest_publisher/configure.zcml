@@ -1,19 +1,24 @@
 <configure
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:five="http://namespaces.zope.org/five">
+    xmlns="http://namespaces.zope.org/zope">
+
+  <include package="zope.app.publication" file="meta.zcml" />
 
 <!--  <five:registerPackage package="." initialize=".zope2.initialize" /> -->
-
-  <class class=".base.APIData">
-    <allow attributes="publishTraverse browserDefault __call__"/>
-  </class>
-
-  <class class=".base.RestDoc">
-    <allow attributes="publishTraverse browserDefault __call__"/>
-  </class>
 
   <class class=".base.APIBase">
     <allow attributes="publishTraverse browserDefault __call__"/>
   </class>
+
+<!--
+  Enable this if you get an error: 'method not allowed' because there is no publisher for: PATCH, DELETE, etc...
+  Error:
+        <publisher
+            name="BROWSER"
+            factory="zope.app.publication.requestpublicationfactories.HTTPFactory"
+            methods="*"
+            mimetypes="*"
+            priority="0"
+    />
+-->
 
 </configure>
