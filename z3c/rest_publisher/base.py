@@ -1,5 +1,7 @@
+import datetime
 import json
 import logging
+
 from wcore import interfaces
 from zope.browserpage import ViewPageTemplateFile
 from zope.component import adapts, queryMultiAdapter
@@ -38,9 +40,22 @@ class APIBase(object):
         """  Overwrite this method to add a custom authentication for your REST API """
         return True
 
+    @staticmethod
+    def format_unsupported_value(value):
+        """ Use this static function if there is a value that is not supported by the standard 'format_output'
+        function """
+        if isinstance(value, datetime.datetime):
+            return value.isoformat()
+        elif isinstance(value, datetime.date):
+            return value.isoformat()
+        elif value is None:
+            return ''
+        else:
+            return str(value)
+
     def format_output(self, data):
         """ format the output. default: json  """
-        return json.dumps(data)
+        return json.dumps(data, default=self.format_unsupported_value)
 
     def browserDefault(self, request):
         return self, ()
@@ -69,7 +84,7 @@ class APIBase(object):
                 self.request.response.setStatus(403)
                 return "The HTTP-method '%s' is not supported" % method
 
-            if not self.check_authentication(method):
+            if not self.public and not self.check_authentication(method):
                 self.request.response.setStatus(403)
                 return "Access denied"
 

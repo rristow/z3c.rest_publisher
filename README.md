@@ -117,7 +117,7 @@ To implement a "generic" traverse to access specific database objects, use the w
                 self.request.response.setStatus(404)
                 return "User not found"
 
-    class APIMembersRoot(APIBase):
+    class APIMembers(APIBase):
         content = {'*': APIUSer}
 
     class APIRoot(APIBase):

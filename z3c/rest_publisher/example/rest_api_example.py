@@ -189,19 +189,13 @@ class APIRoot(SecureAPIBase):
 
     def traverse_headquarter(self, request, name):
         """
-        My TeST
+        Return information from headquarter
         :return: APIHeadquarter
         """
         return APIHeadquarter(context=headquarter, request=request, name=name, parent_api_obj=self)
 
     def traverse_companies(self, request, name):
         return APICompanies(context=DB, request=request, name=name, parent_api_obj=self)
-
-    def traverse_help(self, request, name):
-        """ Add the auto generated documentation if you desire """
-        return APIDocumentation(self, self.request)
-
-    #        return APIDocumentation(context=DB, request=request, name=name, parent_api_obj=self)
 
     def __init__(self, context, request):
         self.name = "testapi"
