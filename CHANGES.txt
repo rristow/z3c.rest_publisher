@@ -1,11 +1,12 @@
 Changelog
 =========
 
-0.9 (15.07.20)
---------------
+0.9.1 (15.07.20)
+----------------
 
 - Redesign code.
-
+- Improved the documentation
+- Added a complete example
 
 0.8 (08.05.20)
 --------------

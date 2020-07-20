@@ -4,17 +4,17 @@ z3c.rest_publisher Package Readme
 Overview
 --------
 
-This product registers Zope-traverses (IBrowserPublisher) to implement basic REST requests in a simpler way.
-This is done by registering traversable objects (IBrowserPublisher) to represent each method or level of the REST API.
-No documents or folders will be accessed directly. It is necessary to create classes for each information to be accessed by the API.
+This product uses the ZOPE / Plone infrastructure (basically traverse) to create a ReSTfull API. The data will be
+accessed through APIBase objects that will be accessible by HTTP requests.
 
 For example, in the following request:
 
     curl http://localhost:8080/testapi/companies/company1
 
-- api - It's a view (inherited from APIBase) registered for ROOT
-- companies - It's a object inherited from APIBase traversed from "api"
-- company1 - It's a object inherited from APIBase traversed from "companies"
+- api - It's a Zope view (inherited from APIBase) registered for Site-ROOT
+- companies - It's a object inherited from APIBase include in the "api" object
+- company1 - It's a object inherited from APIBase include in the "companies" object
+- The default method (in this case "verb_get") from company1 will be called and return the data (json). 
 
 Install
 -------
@@ -24,8 +24,8 @@ pip install z3c.rest_publisher
 Configuration
 -------------
 
-1 - First create a base class for the API. Although this is not mandatory, this is the best way to 
-adjust the existing options.
+1 - First create a base class for the API. Although this is not mandatory, this is the best way to overwrite the 
+existing options.
 
 from z3c.rest_publisher.base import APIBase
 
@@ -78,7 +78,7 @@ class APIRoot(MyAPIBase):
 Tests e.g.
 
     curl -X GET http://127.0.0.1:8080/testapi
-    {"result": "Hello world!"}
+      {"result": "Hello world!"}
 
 4 - Add more verbs
 --------------------
@@ -97,7 +97,7 @@ class APIRoot(MyAPIBase):
 Tests e.g.
 
     curl -X POST http://127.0.0.1:8080/testapi
-    {"result": "You sent a POST!"}
+      {"result": "You sent a POST!"}
 
 
 3 - Add more resources (traverse)
@@ -140,7 +140,7 @@ class APIBooks(MyAPIBase):
 Tests e.g.
 
     curl -X GET http://127.0.0.1:8080/testapi/books/book2
-    {"id": "book2", "title": "My second book!"}
+      {"id": "book2", "title": "My second book!"}
 
 
 Authentication
